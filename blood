@@ -1,0 +1,84 @@
+import pygame
+import random
+
+# Инициализация Pygame
+pygame.init()
+
+# Определение цветов
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+# Определение размеров экрана
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+# Создание окна
+screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+
+# Установка заголовка окна
+pygame.display.set_caption("Пасьянс Паук")
+
+# Определение шрифтов
+font = pygame.font.SysFont(None, 25)
+
+# Определение констант
+CARD_WIDTH = 70
+CARD_HEIGHT = 100
+SPIDER_IMAGE = pygame.image.load("spider.png")
+SPIDER_IMAGE = pygame.transform.scale(SPIDER_IMAGE, (CARD_WIDTH, CARD_HEIGHT))
+CARD_BACK_IMAGE = pygame.image.load("card_back.png")
+CARD_BACK_IMAGE = pygame.transform.scale(CARD_BACK_IMAGE, (CARD_WIDTH, CARD_HEIGHT))
+
+# Определение класса карты
+class Card:
+    def __init__(self, suit, rank, x, y):
+        self.suit = suit
+        self.rank = rank
+        self.x = x
+        self.y = y
+        self.is_face_up = False
+        self.is_selected = False
+    
+    # Отображение карты на экране
+    def draw(self):
+        if self.is_face_up:
+            pygame.draw.rect(screen, WHITE, [self.x, self.y, CARD_WIDTH, CARD_HEIGHT])
+            text = font.render(self.suit + " " + self.rank, True, BLACK)
+            screen.blit(text, [self.x + 5, self.y + 5])
+        else:
+            screen.blit(CARD_BACK_IMAGE, [self.x, self.y])
+        
+        if self.is_selected:
+            pygame.draw.rect(screen, GREEN, [self.x, self.y, CARD_WIDTH, CARD_HEIGHT], 3)
+
+# Определение класса колоды
+class Deck:
+    def __init__(self):
+        self.cards = []
+        for suit in ["♥", "♦", "♣", "♠"]:
+            for rank in ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]:
+                self.cards.append(Card(suit, rank, 0, 0))
+    
+    # Перетасовка колоды
+    def shuffle(self):
+        random.shuffle(self.cards)
+    
+    # Раздача карт из колоды
+    def deal(self, tableau):
+        for i in range(len(tableau)):
+            for j in range(i + 1):
+                card = self.cards.pop()
+                card.is_face_up = (i == j)
+                card.x = 50 + (CARD_WIDTH + 10) * i
+                card.y = 150 + (CARD_HEIGHT + 10) * j
+                tableau[i].append(card)
+        for i in range(4):
+            card = self.cards.pop()
+            card.is_face_up = True
+            card.x = 50 + (CARD_WIDTH + 10) * i
+            card.y = 50
+            foundation[i].append(card)
+    
+    #
